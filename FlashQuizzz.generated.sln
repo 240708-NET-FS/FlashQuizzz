@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashQuizzz.API", "FlashQuizzz.API\FlashQuizzz.API.csproj", "{B4C44E36-26F8-497E-B02A-DA5A293C8122}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashQuizzz.API", "FlashQuizzz.API\FlashQuizzz.API.csproj", "{B09AAF64-6CA5-4D52-8E16-BD2B6974674A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashQuizzz.TEST", "FlashQuizzz.TEST\FlashQuizzz.TEST.csproj", "{613C22A2-E583-4099-B085-3BDF73F51CE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashQuizzz.TEST", "FlashQuizzz.TEST\FlashQuizzz.TEST.csproj", "{E7FD7F25-C514-448F-9DE9-FD9DE09BA7AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B4C44E36-26F8-497E-B02A-DA5A293C8122}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B4C44E36-26F8-497E-B02A-DA5A293C8122}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B4C44E36-26F8-497E-B02A-DA5A293C8122}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B4C44E36-26F8-497E-B02A-DA5A293C8122}.Release|Any CPU.Build.0 = Release|Any CPU
-		{613C22A2-E583-4099-B085-3BDF73F51CE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{613C22A2-E583-4099-B085-3BDF73F51CE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{613C22A2-E583-4099-B085-3BDF73F51CE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{613C22A2-E583-4099-B085-3BDF73F51CE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B09AAF64-6CA5-4D52-8E16-BD2B6974674A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B09AAF64-6CA5-4D52-8E16-BD2B6974674A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B09AAF64-6CA5-4D52-8E16-BD2B6974674A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B09AAF64-6CA5-4D52-8E16-BD2B6974674A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7FD7F25-C514-448F-9DE9-FD9DE09BA7AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7FD7F25-C514-448F-9DE9-FD9DE09BA7AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7FD7F25-C514-448F-9DE9-FD9DE09BA7AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7FD7F25-C514-448F-9DE9-FD9DE09BA7AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
