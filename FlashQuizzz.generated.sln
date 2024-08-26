@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashQuizzz.TEST", "FlashQuizzz.TEST\FlashQuizzz.TEST.csproj", "{1146E5DF-02C2-4F35-A02D-0609534B1EF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashQuizzz.API", "FlashQuizzz.API\FlashQuizzz.API.csproj", "{B4C44E36-26F8-497E-B02A-DA5A293C8122}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashQuizzz.API", "FlashQuizzz.API\FlashQuizzz.API.csproj", "{0B8BA3D5-7854-401E-BD32-002AFE93A4DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashQuizzz.TEST", "FlashQuizzz.TEST\FlashQuizzz.TEST.csproj", "{613C22A2-E583-4099-B085-3BDF73F51CE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1146E5DF-02C2-4F35-A02D-0609534B1EF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1146E5DF-02C2-4F35-A02D-0609534B1EF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1146E5DF-02C2-4F35-A02D-0609534B1EF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1146E5DF-02C2-4F35-A02D-0609534B1EF0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0B8BA3D5-7854-401E-BD32-002AFE93A4DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0B8BA3D5-7854-401E-BD32-002AFE93A4DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0B8BA3D5-7854-401E-BD32-002AFE93A4DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0B8BA3D5-7854-401E-BD32-002AFE93A4DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4C44E36-26F8-497E-B02A-DA5A293C8122}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4C44E36-26F8-497E-B02A-DA5A293C8122}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4C44E36-26F8-497E-B02A-DA5A293C8122}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4C44E36-26F8-497E-B02A-DA5A293C8122}.Release|Any CPU.Build.0 = Release|Any CPU
+		{613C22A2-E583-4099-B085-3BDF73F51CE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{613C22A2-E583-4099-B085-3BDF73F51CE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{613C22A2-E583-4099-B085-3BDF73F51CE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{613C22A2-E583-4099-B085-3BDF73F51CE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

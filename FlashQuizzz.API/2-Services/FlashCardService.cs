@@ -1,60 +1,101 @@
+using FlashQuizzz.API.DAO;
 using FlashQuizzz.API.DAO.Interfaces;
 using FlashQuizzz.API.Exceptions;
 using FlashQuizzz.API.Models;
-using Microsoft.AspNetCore.Identity;
-using uUtil = FlashQuizzz.API.Utilities.UserUtility;
+using Microsoft.EntityFrameworkCore;
+using FlashQuizzz.API.Utilities;
 
-namespace FlashQuizzz.API.Services;
-
-public class FlashCardService : IFlashCardService
+namespace FlashQuizzz.API.Services
 {
-    public Task<FlashCard> CreateFlashCard(FlashCardDTO newFlashCard)
+    public class FlashCardService : IFlashCardService
     {
-        throw new NotImplementedException();
-    }
+        private readonly AppDbContext _context;
 
-    public Task<FlashCard?> Delete(int ID)
-    {
-        throw new NotImplementedException();
-    }
+        public FlashCardService(AppDbContext context)
+        {
+            _context = context;
+        }
 
-    public Task<ICollection<FlashCard>> GetAllFlashCards()
-    {
-        throw new NotImplementedException();
-    }
+        public async Task<FlashCard> CreateFlashCard(FlashCardDTO newFlashCardDTO)
+        {
+            var flashCard = FlashCardUtility.DTOToFlashCard(newFlashCardDTO);
 
-    public Task<FlashCard?> GetByFlashCardName(string flashCardName)
-    {
-        throw new NotImplementedException();
-    }
+            _context.FlashCard.Add(flashCard);
+            await _context.SaveChangesAsync();
 
-    public Task<FlashCard?> GetByFlashCardNameAndUserID(string flashCardName, string UserID)
-    {
-        throw new NotImplementedException();
-    }
+            return flashCard;
+        }
 
-    public Task<FlashCard?> GetByFlashCardNumber(int flashCardNumber)
-    {
-        throw new NotImplementedException();
-    }
+        public async Task<FlashCard?> Delete(int id)
+        {
+            var flashCard = await _context.FlashCard.FindAsync(id);
 
-    public Task<FlashCard?> GetByFlashCardNumberAndUserID(int flashCardID, string userId)
-    {
-        throw new NotImplementedException();
-    }
+            if (flashCard == null)
+                return null;
 
-    public Task<ICollection<FlashCard>> GetByUser(string ID)
-    {
-        throw new NotImplementedException();
-    }
+            _context.FlashCard.Remove(flashCard);
+            await _context.SaveChangesAsync();
 
-    public Task<FlashCard?> GetFlashCardById(int flashCardID)
-    {
-        throw new NotImplementedException();
-    }
+            return flashCard;
+        }
 
-    public Task<bool> Update(int ID, FlashCardDTO newFlashCard)
-    {
-        throw new NotImplementedException();
+        public async Task<ICollection<FlashCard>> GetAllFlashCards()
+        {
+            return await _context.FlashCard.ToListAsync();
+        }
+
+        public async Task<FlashCard?> GetByFlashCardName(string flashCardName)
+        {
+            return await _context.FlashCard
+                .FirstOrDefaultAsync(fc => fc.FlashCardQuestion == flashCardName);
+        }
+
+        public async Task<FlashCard?> GetByFlashCardNameAndUserID(string flashCardName, string userId)
+        {
+            return await _context.FlashCard
+                .FirstOrDefaultAsync(fc => fc.FlashCardQuestion == flashCardName && fc.UserID == userId);
+        }
+
+        public async Task<FlashCard?> GetByFlashCardNumber(int flashCardNumber)
+        {
+            return await _context.FlashCard
+                .FirstOrDefaultAsync(fc => fc.FlashCardID == flashCardNumber);
+        }
+
+        public async Task<FlashCard?> GetByFlashCardNumberAndUserID(int flashCardID, string userId)
+        {
+            return await _context.FlashCard
+                .FirstOrDefaultAsync(fc => fc.FlashCardID == flashCardID && fc.UserID == userId);
+        }
+
+        public async Task<ICollection<FlashCard>> GetByUser(string userId)
+        {
+            return await _context.FlashCard
+                .Where(fc => fc.UserID == userId)
+                .ToListAsync();
+        }
+
+        public async Task<FlashCard?> GetFlashCardById(int flashCardID)
+        {
+            return await _context.FlashCard.FindAsync(flashCardID);
+        }
+
+        public async Task<bool> Update(int id, FlashCardDTO updatedFlashCardDTO)
+        {
+            var flashCard = await _context.FlashCard.FindAsync(id);
+
+            if (flashCard == null)
+                return false;
+
+            flashCard.FlashCardQuestion = updatedFlashCardDTO.FlashCardQuestion;
+            flashCard.FlashCardAnswer = updatedFlashCardDTO.FlashCardAnswer;
+            flashCard.CreatedDate = updatedFlashCardDTO.CreatedDate;
+            flashCard.UserID = updatedFlashCardDTO.UserID ?? flashCard.UserID;
+
+            _context.FlashCard.Update(flashCard);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
