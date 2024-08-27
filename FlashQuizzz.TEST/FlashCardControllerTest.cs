@@ -1,5 +1,5 @@
-using Moq;
 using Xunit;
+using Moq;
 using FlashQuizzz.API.Controllers;
 using FlashQuizzz.API.Models;
 using FlashQuizzz.API.Services;
@@ -30,7 +30,8 @@ namespace FlashQuizzz.API.Tests
                 FlashCardQuestion = "Question", 
                 FlashCardAnswer = "Answer", 
                 CreatedDate = DateTime.UtcNow, 
-                UserID = "user1" 
+                UserID = "user1",
+                FlashCardCategoryID = 1 // Ensure all required properties are set
             };
             var createdFlashCard = new FlashCard 
             { 
@@ -38,7 +39,8 @@ namespace FlashQuizzz.API.Tests
                 FlashCardQuestion = "Question", 
                 FlashCardAnswer = "Answer", 
                 CreatedDate = DateTime.UtcNow, 
-                UserID = "user1" 
+                UserID = "user1",
+                FlashCardCategoryID = 1 // Ensure all required properties are set
             };
             _mockService.Setup(service => service.CreateFlashCard(It.IsAny<FlashCardDTO>()))
                         .ReturnsAsync(createdFlashCard);
@@ -73,7 +75,8 @@ namespace FlashQuizzz.API.Tests
                 FlashCardQuestion = "Question", 
                 FlashCardAnswer = "Answer", 
                 CreatedDate = DateTime.UtcNow, 
-                UserID = "user1" 
+                UserID = "user1",
+                FlashCardCategoryID = 1 // Ensure all required properties are set
             };
             _mockService.Setup(service => service.Delete(flashCardId))
                         .ReturnsAsync(flashCard);
@@ -91,7 +94,7 @@ namespace FlashQuizzz.API.Tests
             // Arrange
             var flashCardId = 1;
             _mockService.Setup(service => service.Delete(flashCardId))
-                        .ReturnsAsync((FlashCard)null);
+                        .ReturnsAsync((FlashCard?)null); // Use nullable type to avoid warnings
 
             // Act
             var result = await _controller.DeleteFlashCard(flashCardId);
@@ -112,7 +115,8 @@ namespace FlashQuizzz.API.Tests
                     FlashCardQuestion = "Question1", 
                     FlashCardAnswer = "Answer1", 
                     CreatedDate = DateTime.UtcNow, 
-                    UserID = "user1" 
+                    UserID = "user1",
+                    FlashCardCategoryID = 1 // Ensure all required properties are set
                 }
             };
             _mockService.Setup(service => service.GetAllFlashCards())
@@ -137,7 +141,8 @@ namespace FlashQuizzz.API.Tests
                 FlashCardQuestion = "Question", 
                 FlashCardAnswer = "Answer", 
                 CreatedDate = DateTime.UtcNow, 
-                UserID = "user1" 
+                UserID = "user1",
+                FlashCardCategoryID = 1 // Ensure all required properties are set
             };
             _mockService.Setup(service => service.GetFlashCardById(flashCardId))
                         .ReturnsAsync(flashCard);
@@ -156,7 +161,7 @@ namespace FlashQuizzz.API.Tests
             // Arrange
             var flashCardId = 1;
             _mockService.Setup(service => service.GetFlashCardById(flashCardId))
-                        .ReturnsAsync((FlashCard)null);
+                        .ReturnsAsync((FlashCard?)null); // Use nullable type to avoid warnings
 
             // Act
             var result = await _controller.GetFlashCardById(flashCardId);
@@ -175,7 +180,8 @@ namespace FlashQuizzz.API.Tests
                 FlashCardQuestion = "Updated Question", 
                 FlashCardAnswer = "Updated Answer", 
                 CreatedDate = DateTime.UtcNow, 
-                UserID = "user1" 
+                UserID = "user1",
+                FlashCardCategoryID = 1 // Ensure all required properties are set
             };
             _mockService.Setup(service => service.Update(flashCardId, updatedFlashCard))
                         .ReturnsAsync(true);
@@ -210,7 +216,8 @@ namespace FlashQuizzz.API.Tests
                     FlashCardQuestion = "Question1", 
                     FlashCardAnswer = "Answer1", 
                     CreatedDate = DateTime.UtcNow, 
-                    UserID = userId 
+                    UserID = userId,
+                    FlashCardCategoryID = 1 // Ensure all required properties are set
                 }
             };
             _mockService.Setup(service => service.GetByUser(userId))
