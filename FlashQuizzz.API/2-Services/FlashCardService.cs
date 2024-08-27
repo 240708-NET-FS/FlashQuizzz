@@ -12,6 +12,12 @@ namespace FlashQuizzz.API.Services
     {
         private readonly AppDbContext _context;
         private readonly IFlashCardRepo _flashCardRepo;
+        private AppDbContext appDbContext;
+
+        public FlashCardService(AppDbContext appDbContext)
+        {
+            this.appDbContext = appDbContext;
+        }
 
         public FlashCardService(AppDbContext context, IFlashCardRepo flashCardRepo)
         {

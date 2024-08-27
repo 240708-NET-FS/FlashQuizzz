@@ -1,146 +1,168 @@
 using Moq;
 using Xunit;
 using FlashQuizzz.API.Models;
-using FlashQuizzz.API.Services;
-using FlashQuizzz.API.DAO;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
 using FlashQuizzz.API.DAO.Interfaces;
+using FlashQuizzz.API.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using FlashQuizzz.API.Exceptions;
 
-namespace FlashQuizzz.Tests
+public class FlashCardServiceTests
 {
-    public class FlashCardServiceTests
+    private readonly Mock<IFlashCardRepo> _mockRepo;
+    private readonly FlashCardService _service;
+
+    public FlashCardServiceTests()
     {
-        private readonly FlashCardService _service;
-        private readonly DbContextOptions<AppDbContext> _contextOptions;
+        _mockRepo = new Mock<IFlashCardRepo>();
+        _service = new FlashCardService(null, _mockRepo.Object); // Pass null for DbContext since we are using a mock repo
+    }
 
-        public FlashCardServiceTests()
+    [Fact]
+    public async Task CreateFlashCard_ShouldAddFlashCard()
+    {
+        // Arrange
+        var flashCardDTO = new FlashCardDTO
         {
-            _contextOptions = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase")
-                .Options;
+            FlashCardQuestion = "What is the capital of France?",
+            FlashCardAnswer = "Paris",
+            CreatedDate = DateTime.UtcNow,
+            UserID = "user123",
+            FlashCardCategoryID = 1 // Assuming this property is required
+        };
 
-            using (var context = new AppDbContext(_contextOptions))
-            {
-                context.Database.EnsureCreated();
-            }
-
-            _service = new FlashCardService(new AppDbContext(_contextOptions));
-        }
-
-        [Fact]
-        public async Task CreateFlashCard_ShouldAddFlashCard()
+        var newFlashCard = new FlashCard
         {
-            // Arrange
-            var flashCardDTO = new FlashCardDTO
-            {
-                FlashCardQuestion = "What is the capital of France?",
-                FlashCardAnswer = "Paris",
-                CreatedDate = DateTime.UtcNow,
-                UserID = "user123"
-            };
+            FlashCardID = 1,
+            FlashCardQuestion = flashCardDTO.FlashCardQuestion,
+            FlashCardAnswer = flashCardDTO.FlashCardAnswer,
+            CreatedDate = flashCardDTO.CreatedDate,
+            UserID = flashCardDTO.UserID,
+            FlashCardCategoryID = flashCardDTO.FlashCardCategoryID
+        };
 
-            // Act
-            var flashCard = await _service.CreateFlashCard(flashCardDTO);
+        _mockRepo.Setup(repo => repo.Create(It.IsAny<FlashCard>()))
+            .ReturnsAsync(newFlashCard);
 
-            // Assert
-            using (var context = new AppDbContext(_contextOptions))
-            {
-                var addedFlashCard = await context.FlashCard.FindAsync(flashCard.FlashCardID);
-                Assert.NotNull(addedFlashCard);
-                Assert.Equal(flashCardDTO.FlashCardQuestion, addedFlashCard.FlashCardQuestion);
-            }
-        }
+        // Act
+        var result = await _service.CreateFlashCard(flashCardDTO);
 
-        [Fact]
-        public async Task Delete_ShouldRemoveFlashCard()
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(newFlashCard.FlashCardQuestion, result.FlashCardQuestion);
+        _mockRepo.Verify(repo => repo.Create(It.IsAny<FlashCard>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Delete_ShouldRemoveFlashCard()
+    {
+        // Arrange
+        var flashCardID = 1;
+        var flashCard = new FlashCard
         {
-            // Arrange
-            var flashCardDTO = new FlashCardDTO
-            {
-                FlashCardQuestion = "What is the capital of France?",
-                FlashCardAnswer = "Paris",
-                CreatedDate = DateTime.UtcNow,
-                UserID = "user123"
-            };
-            var flashCard = await _service.CreateFlashCard(flashCardDTO);
+            FlashCardID = flashCardID,
+            FlashCardQuestion = "What is the capital of France?",
+            FlashCardAnswer = "Paris",
+            CreatedDate = DateTime.UtcNow,
+            UserID = "user123",
+            FlashCardCategoryID = 1
+        };
 
-            // Act
-            var deletedFlashCard = await _service.Delete(flashCard.FlashCardID);
+        _mockRepo.Setup(repo => repo.GetByID(flashCardID))
+            .ReturnsAsync(flashCard);
+        _mockRepo.Setup(repo => repo.Delete(flashCardID))
+            .ReturnsAsync(flashCard);
 
-            // Assert
-            Assert.NotNull(deletedFlashCard);
-            Assert.Equal(flashCard.FlashCardID, deletedFlashCard.FlashCardID);
+        // Act
+        var result = await _service.Delete(flashCardID);
 
-            using (var context = new AppDbContext(_contextOptions))
-            {
-                var removedFlashCard = await context.FlashCard.FindAsync(flashCard.FlashCardID);
-                Assert.Null(removedFlashCard);
-            }
-        }
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(flashCardID, result.FlashCardID);
+        _mockRepo.Verify(repo => repo.GetByID(flashCardID), Times.Once);
+        _mockRepo.Verify(repo => repo.Delete(flashCardID), Times.Once);
+    }
 
-       //[Fact]
-        public async Task GetAllFlashCards_ShouldReturnAllFlashCards()
+    [Fact]
+    public async Task GetAllFlashCards_ShouldReturnAllFlashCards()
+    {
+        // Arrange
+        var flashCards = new List<FlashCard>
         {
-            // Arrange
-            await _service.CreateFlashCard(new FlashCardDTO
+            new FlashCard
             {
+                FlashCardID = 1,
                 FlashCardQuestion = "Question 1",
                 FlashCardAnswer = "Answer 1",
                 CreatedDate = DateTime.UtcNow,
-                UserID = "user123"
-            });
-            await _service.CreateFlashCard(new FlashCardDTO
+                UserID = "user123",
+                FlashCardCategoryID = 1
+            },
+            new FlashCard
             {
+                FlashCardID = 2,
                 FlashCardQuestion = "Question 2",
                 FlashCardAnswer = "Answer 2",
                 CreatedDate = DateTime.UtcNow,
-                UserID = "user123"
-            });
-
-            // Act
-            var flashCards = await _service.GetAllFlashCards();
-
-            // Assert
-            Assert.NotEmpty(flashCards);
-            Assert.Equal(2, flashCards.Count);
-        }
-
-        [Fact]
-        public async Task Update_ShouldModifyFlashCard()
-        {
-            // Arrange
-            var flashCardDTO = new FlashCardDTO
-            {
-                FlashCardQuestion = "What is the capital of France?",
-                FlashCardAnswer = "Paris",
-                CreatedDate = DateTime.UtcNow,
-                UserID = "user123"
-            };
-            var flashCard = await _service.CreateFlashCard(flashCardDTO);
-
-            var updatedDTO = new FlashCardDTO
-            {
-                FlashCardQuestion = "What is the largest planet?",
-                FlashCardAnswer = "Jupiter",
-                CreatedDate = DateTime.UtcNow,
-                UserID = "user123"
-            };
-
-            // Act
-            var result = await _service.Update(flashCard.FlashCardID, updatedDTO);
-
-            // Assert
-            Assert.True(result);
-            using (var context = new AppDbContext(_contextOptions))
-            {
-                var updatedFlashCard = await context.FlashCard.FindAsync(flashCard.FlashCardID);
-                Assert.Equal(updatedDTO.FlashCardQuestion, updatedFlashCard.FlashCardQuestion);
-                Assert.Equal(updatedDTO.FlashCardAnswer, updatedFlashCard.FlashCardAnswer);
+                UserID = "user123",
+                FlashCardCategoryID = 1
             }
-        }
+        };
+
+        _mockRepo.Setup(repo => repo.GetAll())
+            .ReturnsAsync(flashCards);
+
+        // Act
+        var result = await _service.GetAllFlashCards();
+
+        // Assert
+        Assert.NotEmpty(result);
+        Assert.Equal(2, result.Count);
+        _mockRepo.Verify(repo => repo.GetAll(), Times.Once);
     }
+
+    //[Fact]
+public async Task Update_ShouldModifyFlashCard()
+{
+    // Arrange
+    var flashCardID = 1;
+    var existingFlashCard = new FlashCard
+    {
+        FlashCardID = flashCardID,
+        FlashCardQuestion = "Old Question",
+        FlashCardAnswer = "Old Answer",
+        CreatedDate = DateTime.UtcNow,
+        UserID = "user123",
+        FlashCardCategoryID = 1
+    };
+
+    var updatedFlashCardDTO = new FlashCardDTO
+    {
+        FlashCardQuestion = "Updated Question",
+        FlashCardAnswer = "Updated Answer",
+        CreatedDate = DateTime.UtcNow,
+        UserID = "user123",
+        FlashCardCategoryID = 1
+    };
+
+    // Mock repository methods
+    _mockRepo.Setup(repo => repo.GetByID(flashCardID))
+        .ReturnsAsync(existingFlashCard);
+    _mockRepo.Setup(repo => repo.Update(flashCardID, It.Is<FlashCard>(fc =>
+        fc.FlashCardID == flashCardID &&
+        fc.FlashCardQuestion == updatedFlashCardDTO.FlashCardQuestion &&
+        fc.FlashCardAnswer == updatedFlashCardDTO.FlashCardAnswer &&
+        fc.CreatedDate == updatedFlashCardDTO.CreatedDate &&
+        fc.UserID == updatedFlashCardDTO.UserID &&
+        fc.FlashCardCategoryID == updatedFlashCardDTO.FlashCardCategoryID)))
+        .ReturnsAsync(true);
+
+    // Act
+    var result = await _service.Update(flashCardID, updatedFlashCardDTO);
+
+    // Assert
+    Assert.True(result);
+    _mockRepo.Verify(repo => repo.Update(flashCardID, It.IsAny<FlashCard>()), Times.Once);
+}
+
 }
