@@ -105,4 +105,14 @@ public class FlashCardRepo : IFlashCardRepo
                 .Include(r => r.User)
                 .FirstOrDefaultAsync(r => r.FlashCardAnswer == flashCardAnswer);
     }
+
+    Task<List<FlashCard>> IFlashCardRepo.GetByUser(string userId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void GetByFlashCardNumberAndUserID(int flashCardID, string userId)
+    {
+        throw new NotImplementedException();
+    }
 }

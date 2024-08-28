@@ -12,12 +12,6 @@ namespace FlashQuizzz.API.Services
     {
         private readonly AppDbContext _context;
         private readonly IFlashCardRepo _flashCardRepo;
-        private AppDbContext appDbContext;
-
-        public FlashCardService(AppDbContext appDbContext)
-        {
-            this.appDbContext = appDbContext;
-        }
 
         public FlashCardService(AppDbContext context, IFlashCardRepo flashCardRepo)
         {
@@ -93,16 +87,14 @@ namespace FlashQuizzz.API.Services
             //     .ToListAsync();
         }
 
-        public async Task<FlashCard?> GetByFlashCardName(string flashCardName)
+        public Task<FlashCard?> GetByFlashCardName(string flashCardName)
         {
-            return await _context.FlashCard
-                .FirstOrDefaultAsync(fc => fc.FlashCardQuestion == flashCardName);
+            throw new NotImplementedException();
         }
 
-        public async Task<FlashCard?> GetByFlashCardNameAndUserID(string flashCardName, string userId)
+        public Task<FlashCard?> GetByFlashCardNameAndUserID(string flashCardName, string UserID)
         {
-            return await _context.FlashCard
-                .FirstOrDefaultAsync(fc => fc.FlashCardQuestion == flashCardName && fc.UserID == userId);
+            throw new NotImplementedException();
         }
 
         public async Task<FlashCard?> GetByFlashCardNumber(int flashCardNumber)
@@ -146,5 +138,7 @@ namespace FlashQuizzz.API.Services
 
             return true;
         }
+
+        
     }
 }

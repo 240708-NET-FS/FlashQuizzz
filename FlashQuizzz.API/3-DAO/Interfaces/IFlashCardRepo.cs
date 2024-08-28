@@ -9,6 +9,7 @@ public interface IFlashCardRepo
 
     // Read
     public Task<FlashCard?> GetByID(int ID);
+    public Task<List<FlashCard>> GetByUser(string userId);
 
     public Task<ICollection<FlashCard>>? GetByCategoryID(int ID);
 
@@ -19,4 +20,6 @@ public interface IFlashCardRepo
 
     // Delete
     public Task<FlashCard> Delete(int ID);
+    void GetByFlashCardNumberAndUserID(int flashCardID, string userId);
+    
 }

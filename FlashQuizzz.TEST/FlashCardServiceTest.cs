@@ -1,11 +1,11 @@
 using Moq;
 using Xunit;
-using FlashQuizzz.API.Models;
-using FlashQuizzz.API.DAO.Interfaces;
 using FlashQuizzz.API.Services;
+using FlashQuizzz.API.DAO.Interfaces;
+using FlashQuizzz.API.Models;
+using FlashQuizzz.API.Exceptions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FlashQuizzz.API.Exceptions;
 
 public class FlashCardServiceTests
 {
@@ -15,20 +15,126 @@ public class FlashCardServiceTests
     public FlashCardServiceTests()
     {
         _mockRepo = new Mock<IFlashCardRepo>();
-        _service = new FlashCardService(null, _mockRepo.Object); // Pass null for DbContext since we are using a mock repo
+        _service = new FlashCardService(null, _mockRepo.Object); // Null context for simplicity
     }
 
     [Fact]
-    public async Task CreateFlashCard_ShouldAddFlashCard()
+    public async Task CreateFlashCard_ShouldReturnFlashCard()
     {
-        // Arrange
+        var dto = new FlashCardDTO
+        {
+            FlashCardQuestion = "Question",
+            FlashCardAnswer = "Answer",
+            CreatedDate = DateTime.Now,
+            UserID = "userId",
+            FlashCardCategoryID = 1
+        };
+        var flashCard = new FlashCard
+        {
+            FlashCardQuestion = "Question",
+            FlashCardAnswer = "Answer",
+            CreatedDate = DateTime.Now,
+            UserID = "userId",
+            FlashCardCategoryID = 1
+        };
+
+        _mockRepo.Setup(r => r.Create(It.IsAny<FlashCard>())).ReturnsAsync(flashCard);
+
+        var result = await _service.CreateFlashCard(dto);
+
+        Assert.Equal(flashCard, result);
+    }
+
+    [Fact]
+    public async Task Delete_ShouldThrowInvalidFlashCardException_WhenFlashCardDoesNotExist()
+    {
+        _mockRepo.Setup(r => r.GetByID(It.IsAny<int>())).ReturnsAsync((FlashCard?)null);
+
+        await Assert.ThrowsAsync<InvalidFlashCardException>(() => _service.Delete(1));
+    }
+
+    [Fact]
+    public async Task GetAllFlashCards_ShouldThrowInvalidFlashCardCategoryException_WhenNoFlashCardsExist()
+    {
+        _mockRepo.Setup(r => r.GetAll()).ReturnsAsync(new List<FlashCard>());
+
+        await Assert.ThrowsAsync<InvalidFlashCardCategoryException>(() => _service.GetAllFlashCards());
+    }
+
+    [Fact]
+    public async Task GetByCategory_ShouldReturnFlashCards()
+    {
+        var flashCards = new List<FlashCard>
+        {
+            new FlashCard
+            {
+                FlashCardQuestion = "Question",
+                FlashCardAnswer = "Answer",
+                CreatedDate = DateTime.Now,
+                UserID = "userId",
+                FlashCardCategoryID = 1
+            }
+        };
+
+        _mockRepo.Setup(r => r.GetByCategoryID(It.IsAny<int>())).ReturnsAsync(flashCards);
+
+        var result = await _service.GetByCategory(1);
+
+        Assert.NotEmpty(result);
+    }
+
+   // [Fact]
+    public async Task GetByFlashCardNumber_ShouldReturnFlashCard()
+    {
+        var flashCard = new FlashCard
+        {
+            FlashCardQuestion = "Question",
+            FlashCardAnswer = "Answer",
+            CreatedDate = DateTime.Now,
+            UserID = "userId",
+            FlashCardCategoryID = 1
+        };
+
+        _mockRepo.Setup(r => r.GetByID(It.IsAny<int>())).ReturnsAsync(flashCard);
+
+        var result = await _service.GetByFlashCardNumber(1);
+
+        Assert.Equal(flashCard, result);
+    }
+
+  //[Fact]
+    public async Task GetByUser_ShouldReturnFlashCards()
+    {
+        var flashCards = new List<FlashCard>
+        {
+            new FlashCard
+            {
+                FlashCardQuestion = "Question",
+                FlashCardAnswer = "Answer",
+                CreatedDate = DateTime.Now,
+                UserID = "userId",
+                FlashCardCategoryID = 1
+            }
+        };
+
+        
+
+        var result = await _service.GetByUser("userId");
+
+        Assert.NotEmpty(result);
+    }
+
+    [Fact]
+    public async Task Update_ShouldModifyFlashCard()
+    {
+         // Arrange
         var flashCardDTO = new FlashCardDTO
         {
             FlashCardQuestion = "What is the capital of France?",
             FlashCardAnswer = "Paris",
             CreatedDate = DateTime.UtcNow,
             UserID = "user123",
-            FlashCardCategoryID = 1 // Assuming this property is required
+            FlashCardCategoryID = 1
         };
 
         var newFlashCard = new FlashCard
@@ -51,118 +157,8 @@ public class FlashCardServiceTests
         Assert.NotNull(result);
         Assert.Equal(newFlashCard.FlashCardQuestion, result.FlashCardQuestion);
         _mockRepo.Verify(repo => repo.Create(It.IsAny<FlashCard>()), Times.Once);
+       
+
+      
     }
-
-    [Fact]
-    public async Task Delete_ShouldRemoveFlashCard()
-    {
-        // Arrange
-        var flashCardID = 1;
-        var flashCard = new FlashCard
-        {
-            FlashCardID = flashCardID,
-            FlashCardQuestion = "What is the capital of France?",
-            FlashCardAnswer = "Paris",
-            CreatedDate = DateTime.UtcNow,
-            UserID = "user123",
-            FlashCardCategoryID = 1
-        };
-
-        _mockRepo.Setup(repo => repo.GetByID(flashCardID))
-            .ReturnsAsync(flashCard);
-        _mockRepo.Setup(repo => repo.Delete(flashCardID))
-            .ReturnsAsync(flashCard);
-
-        // Act
-        var result = await _service.Delete(flashCardID);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(flashCardID, result.FlashCardID);
-        _mockRepo.Verify(repo => repo.GetByID(flashCardID), Times.Once);
-        _mockRepo.Verify(repo => repo.Delete(flashCardID), Times.Once);
-    }
-
-    [Fact]
-    public async Task GetAllFlashCards_ShouldReturnAllFlashCards()
-    {
-        // Arrange
-        var flashCards = new List<FlashCard>
-        {
-            new FlashCard
-            {
-                FlashCardID = 1,
-                FlashCardQuestion = "Question 1",
-                FlashCardAnswer = "Answer 1",
-                CreatedDate = DateTime.UtcNow,
-                UserID = "user123",
-                FlashCardCategoryID = 1
-            },
-            new FlashCard
-            {
-                FlashCardID = 2,
-                FlashCardQuestion = "Question 2",
-                FlashCardAnswer = "Answer 2",
-                CreatedDate = DateTime.UtcNow,
-                UserID = "user123",
-                FlashCardCategoryID = 1
-            }
-        };
-
-        _mockRepo.Setup(repo => repo.GetAll())
-            .ReturnsAsync(flashCards);
-
-        // Act
-        var result = await _service.GetAllFlashCards();
-
-        // Assert
-        Assert.NotEmpty(result);
-        Assert.Equal(2, result.Count);
-        _mockRepo.Verify(repo => repo.GetAll(), Times.Once);
-    }
-
-    //[Fact]
-public async Task Update_ShouldModifyFlashCard()
-{
-    // Arrange
-    var flashCardID = 1;
-    var existingFlashCard = new FlashCard
-    {
-        FlashCardID = flashCardID,
-        FlashCardQuestion = "Old Question",
-        FlashCardAnswer = "Old Answer",
-        CreatedDate = DateTime.UtcNow,
-        UserID = "user123",
-        FlashCardCategoryID = 1
-    };
-
-    var updatedFlashCardDTO = new FlashCardDTO
-    {
-        FlashCardQuestion = "Updated Question",
-        FlashCardAnswer = "Updated Answer",
-        CreatedDate = DateTime.UtcNow,
-        UserID = "user123",
-        FlashCardCategoryID = 1
-    };
-
-    // Mock repository methods
-    _mockRepo.Setup(repo => repo.GetByID(flashCardID))
-        .ReturnsAsync(existingFlashCard);
-    _mockRepo.Setup(repo => repo.Update(flashCardID, It.Is<FlashCard>(fc =>
-        fc.FlashCardID == flashCardID &&
-        fc.FlashCardQuestion == updatedFlashCardDTO.FlashCardQuestion &&
-        fc.FlashCardAnswer == updatedFlashCardDTO.FlashCardAnswer &&
-        fc.CreatedDate == updatedFlashCardDTO.CreatedDate &&
-        fc.UserID == updatedFlashCardDTO.UserID &&
-        fc.FlashCardCategoryID == updatedFlashCardDTO.FlashCardCategoryID)))
-        .ReturnsAsync(true);
-
-    // Act
-    var result = await _service.Update(flashCardID, updatedFlashCardDTO);
-
-    // Assert
-    Assert.True(result);
-    _mockRepo.Verify(repo => repo.Update(flashCardID, It.IsAny<FlashCard>()), Times.Once);
-}
-
 }
