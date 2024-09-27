@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace FlashQuizzz.API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitMigration : Migration
+    public partial class InitialMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,6 +53,21 @@ namespace FlashQuizzz.API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FlashCardCategory",
+                columns: table => new
+                {
+                    FlashCardCategoryID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FlashCardCategoryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FlashCardCategoryStatus = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FlashCardCategory", x => x.FlashCardCategoryID);
                 });
 
             migrationBuilder.CreateTable(
@@ -168,7 +185,8 @@ namespace FlashQuizzz.API.Migrations
                     FlashCardQuestion = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FlashCardAnswer = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserID = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FlashCardCategoryID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -179,6 +197,44 @@ namespace FlashQuizzz.API.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FlashCard_FlashCardCategory_FlashCardCategoryID",
+                        column: x => x.FlashCardCategoryID,
+                        principalTable: "FlashCardCategory",
+                        principalColumn: "FlashCardCategoryID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FlashCardAnswer",
+                columns: table => new
+                {
+                    FlashCardAnswerID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FlashCardAnswerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FlashCardIsAnswer = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FlashCardID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FlashCardAnswer", x => x.FlashCardAnswerID);
+                    table.ForeignKey(
+                        name: "FK_FlashCardAnswer_FlashCardCategory_FlashCardID",
+                        column: x => x.FlashCardID,
+                        principalTable: "FlashCardCategory",
+                        principalColumn: "FlashCardCategoryID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "FlashCardCategory",
+                columns: new[] { "FlashCardCategoryID", "CreatedDate", "FlashCardCategoryName", "FlashCardCategoryStatus" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "HTML", true },
+                    { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "CSS", true },
+                    { 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "JS", true }
                 });
 
             migrationBuilder.CreateIndex(
@@ -221,9 +277,19 @@ namespace FlashQuizzz.API.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FlashCard_FlashCardCategoryID",
+                table: "FlashCard",
+                column: "FlashCardCategoryID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_FlashCard_UserID",
                 table: "FlashCard",
                 column: "UserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FlashCardAnswer_FlashCardID",
+                table: "FlashCardAnswer",
+                column: "FlashCardID");
         }
 
         /// <inheritdoc />
@@ -248,10 +314,16 @@ namespace FlashQuizzz.API.Migrations
                 name: "FlashCard");
 
             migrationBuilder.DropTable(
+                name: "FlashCardAnswer");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "FlashCardCategory");
         }
     }
 }

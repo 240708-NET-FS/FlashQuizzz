@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlashQuizzz.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240826121459_CategoryAndAnswer")]
-    partial class CategoryAndAnswer
+    [Migration("20240830025634_InitialMigrations")]
+    partial class InitialMigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

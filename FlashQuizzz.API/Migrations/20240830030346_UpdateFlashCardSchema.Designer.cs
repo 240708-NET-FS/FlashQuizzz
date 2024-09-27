@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlashQuizzz.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240823165109_InitMigration")]
-    partial class InitMigration
+    [Migration("20240830030346_UpdateFlashCardSchema")]
+    partial class UpdateFlashCardSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,6 +40,9 @@ namespace FlashQuizzz.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("FlashCardCategoryID")
+                        .HasColumnType("int");
+
                     b.Property<string>("FlashCardQuestion")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -50,9 +53,85 @@ namespace FlashQuizzz.API.Migrations
 
                     b.HasKey("FlashCardID");
 
+                    b.HasIndex("FlashCardCategoryID");
+
                     b.HasIndex("UserID");
 
                     b.ToTable("FlashCard");
+                });
+
+            modelBuilder.Entity("FlashQuizzz.API.Models.FlashCardAnswer", b =>
+                {
+                    b.Property<int>("FlashCardAnswerID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FlashCardAnswerID"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FlashCardAnswerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FlashCardID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("FlashCardIsAnswer")
+                        .HasColumnType("bit");
+
+                    b.HasKey("FlashCardAnswerID");
+
+                    b.HasIndex("FlashCardID");
+
+                    b.ToTable("FlashCardAnswer");
+                });
+
+            modelBuilder.Entity("FlashQuizzz.API.Models.FlashCardCategory", b =>
+                {
+                    b.Property<int>("FlashCardCategoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FlashCardCategoryID"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FlashCardCategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("FlashCardCategoryStatus")
+                        .HasColumnType("bit");
+
+                    b.HasKey("FlashCardCategoryID");
+
+                    b.ToTable("FlashCardCategory");
+
+                    b.HasData(
+                        new
+                        {
+                            FlashCardCategoryID = 1,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FlashCardCategoryName = "HTML",
+                            FlashCardCategoryStatus = true
+                        },
+                        new
+                        {
+                            FlashCardCategoryID = 2,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FlashCardCategoryName = "CSS",
+                            FlashCardCategoryStatus = true
+                        },
+                        new
+                        {
+                            FlashCardCategoryID = 3,
+                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            FlashCardCategoryName = "JS",
+                            FlashCardCategoryStatus = true
+                        });
                 });
 
             modelBuilder.Entity("FlashQuizzz.API.Models.User", b =>
@@ -266,13 +345,32 @@ namespace FlashQuizzz.API.Migrations
 
             modelBuilder.Entity("FlashQuizzz.API.Models.FlashCard", b =>
                 {
+                    b.HasOne("FlashQuizzz.API.Models.FlashCardCategory", "FlashCardCategory")
+                        .WithMany()
+                        .HasForeignKey("FlashCardCategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FlashQuizzz.API.Models.User", "User")
                         .WithMany("FlashCards")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("FlashCardCategory");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FlashQuizzz.API.Models.FlashCardAnswer", b =>
+                {
+                    b.HasOne("FlashQuizzz.API.Models.FlashCardCategory", "FlashCardCategory")
+                        .WithMany()
+                        .HasForeignKey("FlashCardID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FlashCardCategory");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
